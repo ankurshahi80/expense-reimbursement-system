@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
 
     @Test
-    public void testLogin_positive() throws SQLException {
+    public void testLogin_positive() throws SQLException, FailedLoginException {
         // Arrange
         UserDao mockUserDao = mock(UserDao.class);
         User testUser = new User(1000,"test","test123","Thomas","Anderson","ta@gmail.com","manager");
@@ -27,7 +27,7 @@ public class UserServiceTest {
         User actual = userService.login("test","test123");
 
         // Assert
-        Assertions.assertEquals(actual,testUser);
+        Assertions.assertEquals(testUser, actual);
     }
 
     @Test
