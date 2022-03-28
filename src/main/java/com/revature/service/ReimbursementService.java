@@ -21,6 +21,21 @@ public class ReimbursementService {
         this.reimbursementDao = mockDao;
     }
 
+    public ResponseReimbursementDTO reviewReimbursement(String reimbId, String reimbStatus, int reimbResolverId) throws SQLException {
+        try{
+            int intReimbId = Integer.parseInt(reimbId);
+
+            Reimbursement reimbursement = this.reimbursementDao.reviewReimbursement(intReimbId,reimbResolverId,reimbStatus);
+            return new ResponseReimbursementDTO(reimbursement.getReimbId(),
+                    reimbursement.getReimbAmt(), reimbursement.getReimbSubmitted(),reimbursement.getReimbDescription(),
+                     reimbursement.getReimbReceipt(),reimbursement.getReimbAuthor().getUsername(),
+                    reimbursement.getReimbResolver().getUsername(),
+                    reimbursement.getReimbStatus(),reimbursement.getReimbType());
+        } catch(NumberFormatException e){
+            throw new IllegalArgumentException("Please check the reimbursement id.");
+        }
+    }
+
     public ResponseReimbursementDTO addReimbursement(int reimbAuthorId, AddReimbursementDTO dto) throws SQLException {
         Reimbursement reimbursementAdded = this.reimbursementDao.addReimbursement(reimbAuthorId, dto);
 
