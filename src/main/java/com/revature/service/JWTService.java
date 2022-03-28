@@ -5,7 +5,6 @@ import io.javalin.http.UnauthorizedResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
-
 import java.security.Key;
 
 public class JWTService {
