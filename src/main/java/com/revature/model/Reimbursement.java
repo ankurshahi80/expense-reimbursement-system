@@ -1,5 +1,6 @@
 package com.revature.model;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ public class Reimbursement {
     private Timestamp reimbSubmitted;
     private Timestamp reimbResolved;
     private String reimbDescription;
-    private String reimbReceipt;
+    private InputStream reimbReceipt;
     private User reimbAuthor;
     private User reimbResolver;
     private String reimbStatus;
@@ -18,7 +19,7 @@ public class Reimbursement {
     public Reimbursement() {
     }
 
-    public Reimbursement(int reimbId, double reimbAmt, Timestamp reimbSubmitted, Timestamp reimbResolved, String reimbDescription, String reimbReceipt, User reimbAuthor, User reimbResolver, String reimbStatus, String reimbType) {
+    public Reimbursement(int reimbId, double reimbAmt, Timestamp reimbSubmitted, Timestamp reimbResolved, String reimbDescription, InputStream reimbReceipt, User reimbAuthor, User reimbResolver, String reimbStatus, String reimbType) {
         this.reimbId = reimbId;
         this.reimbAmt = reimbAmt;
         this.reimbSubmitted = reimbSubmitted;
@@ -71,11 +72,11 @@ public class Reimbursement {
         this.reimbDescription = reimbDescription;
     }
 
-    public String getReimbReceipt() {
+    public InputStream getReimbReceipt() {
         return reimbReceipt;
     }
 
-    public void setReimbReceipt(String reimbReceipt) {
+    public void setReimbReceipt(InputStream reimbReceipt) {
         this.reimbReceipt = reimbReceipt;
     }
 
@@ -132,7 +133,7 @@ public class Reimbursement {
                 ", reimbSubmitted=" + reimbSubmitted +
                 ", reimbResolved=" + reimbResolved +
                 ", reimbDescription='" + reimbDescription + '\'' +
-                ", reimbReceipt='" + reimbReceipt + '\'' +
+                ", reimbReceipt=" + reimbReceipt +
                 ", reimbAuthor=" + reimbAuthor +
                 ", reimbResolver=" + reimbResolver +
                 ", reimbStatus='" + reimbStatus + '\'' +
