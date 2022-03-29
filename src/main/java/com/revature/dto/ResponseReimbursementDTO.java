@@ -8,6 +8,7 @@ public class ResponseReimbursementDTO {
     private int reimbId;
     private double reimbAmount;
     private Timestamp reimbSubmitted;
+    private Timestamp reimbResolved;
     private String reimbDescription;
     private InputStream reimbReceipt;
     private String reimbAuthor;
@@ -18,10 +19,11 @@ public class ResponseReimbursementDTO {
     public ResponseReimbursementDTO() {
     }
 
-    public ResponseReimbursementDTO(int reimbId, double reimbAmount, Timestamp reimbSubmitted, String reimbDescription, InputStream reimbReceipt, String reimbAuthor, String reimbResolver, String reimbStatus, String reimbType) {
+    public ResponseReimbursementDTO(int reimbId, double reimbAmount, Timestamp reimbSubmitted, Timestamp reimbResolved, String reimbDescription, InputStream reimbReceipt, String reimbAuthor, String reimbResolver, String reimbStatus, String reimbType) {
         this.reimbId = reimbId;
         this.reimbAmount = reimbAmount;
         this.reimbSubmitted = reimbSubmitted;
+        this.reimbResolved = reimbResolved;
         this.reimbDescription = reimbDescription;
         this.reimbReceipt = reimbReceipt;
         this.reimbAuthor = reimbAuthor;
@@ -52,6 +54,14 @@ public class ResponseReimbursementDTO {
 
     public void setReimbSubmitted(Timestamp reimbSubmitted) {
         this.reimbSubmitted = reimbSubmitted;
+    }
+
+    public Timestamp getReimbResolved() {
+        return reimbResolved;
+    }
+
+    public void setReimbResolved(Timestamp reimbResolved) {
+        this.reimbResolved = reimbResolved;
     }
 
     public String getReimbDescription() {
