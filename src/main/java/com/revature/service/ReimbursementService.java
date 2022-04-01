@@ -93,11 +93,11 @@ public class ReimbursementService {
         return reimbursementDTOs;
     }
 
-    public InputStream getReimbursementImage(String reimbId, String empId) throws SQLException, ImageNotFoundException {
+    public InputStream getReimbursementImage(String reimbId) throws SQLException, ImageNotFoundException {
         try{
             int rId = Integer.parseInt(reimbId);
-            int eId = Integer.parseInt(empId);
-            InputStream is = this.reimbursementDao.getReimbursementImage(rId, eId);
+
+            InputStream is = this.reimbursementDao.getReimbursementImage(rId);
 
             if(is == null){
                 throw new ImageNotFoundException("Reimbursement id " + reimbId + " does not have an imagge");

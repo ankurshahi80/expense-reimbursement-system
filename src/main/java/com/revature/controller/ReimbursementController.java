@@ -124,23 +124,10 @@ public class ReimbursementController implements Controller{
 
     private Handler getReimbursementImage = ctx -> {
 
-//        String jwt = ctx.header("Authorization").split(" ")[1];
-//        Jws<Claims> token = this.jwtService.parseJwt(jwt);
-
-        String userId = ctx.pathParam("user_id");
-
-//        if(!token.getBody().get("user_role").equals("Employee") || token.getBody().get("user_role").equals("Manager")){
-//            throw new UnauthorizedResponse("You are not authorized to access this page");
-//        };
-//
-//        if(token.getBody().get("user_role").equals("Employee") && !("" + token.getBody().get("user_id")).equals(userId)){
-//            throw new UnauthorizedResponse("You can only access your own assignments");
-//        };
-
         String reimbursementId = ctx.pathParam("reimbursement_id");
 
 
-        InputStream reimbReceipt = this.reimbursementService.getReimbursementImage(reimbursementId, userId);
+        InputStream reimbReceipt = this.reimbursementService.getReimbursementImage(reimbursementId);
         Tika tika = new Tika();
         String mimeType = tika.detect(reimbReceipt);
 
@@ -153,7 +140,7 @@ public class ReimbursementController implements Controller{
         app.get("/reimbursements", getAllReimbursements);
         app.get("/users/{user_id}/reimbursements", getAllReimbursementsById);
         app.post("/users/{user_id}/reimbursements", addReimbursement);
-        app.get("/users/{user_id}/reimbursements/{reimbursement_id}/image",getReimbursementImage);
+        app.get("/reimbursements/{reimbursement_id}/image",getReimbursementImage);
         app.patch("/reimbursements/{reimbursement_id}", reviewReimbursement);
     }
 }
