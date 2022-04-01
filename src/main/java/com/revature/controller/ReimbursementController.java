@@ -54,31 +54,29 @@ public class ReimbursementController implements Controller{
         }
         AddReimbursementDTO dto = new AddReimbursementDTO();
 
-        // capture reimbursement amount
+        // capture reimbursement amount from the form parameters
         double reimbAmount = Double.parseDouble(ctx.formParam("reimbAmount"));
         dto.setReimbAmount(reimbAmount);
 
-        // capture reimbursement description
+        // capture reimbursement description from the form parameter
         String reimbDescription = ctx.formParam("reimbDescription");
         dto.setReimbDescription(reimbDescription);
 
-        // capture reimbursement receipt (image)
+        // capture reimbursement receipt (image) from the form parameter and detect the file type (MIME type)
         UploadedFile file = ctx.uploadedFile("reimbReceipt");
-//        InputStream is = file.getContent();
-//        Tika tika = new Tika();
-//        String mimeType = tika.detect(is);
-
-//        dto.setReimbReceipt(is);
+        InputStream is = file.getContent();
+        dto.setReimbReceipt(is);
 
         // capture reimbursement type
         int reimbType = Integer.parseInt(ctx.formParam("reimbType"));
         dto.setReimbType(reimbType);
 
-//        ResponseReimbursementDTO getDTO = this.reimbursementService.addReimbursement(id,dto);
-        List<Reimbursement> updatedList = this.reimbursementService.addReimbursement(id, dto);
+        ResponseReimbursementDTO getDTO = this.reimbursementService.addReimbursement(id,dto);
+//        List<Reimbursement> updatedList = this.reimbursementService.addReimbursement(id, dto);
+
         ctx.status(201);
-//        ctx.json(getDTO);
-        ctx.json(updatedList);
+        ctx.json(getDTO);
+//        ctx.json(updatedList);
     };
 
     private Handler reviewReimbursement = ctx -> {
@@ -124,11 +122,38 @@ public class ReimbursementController implements Controller{
         ctx.json(reimbursementDTOs);
     };
 
+    private Handler getReimbursementImage = ctx -> {
+
+//        String jwt = ctx.header("Authorization").split(" ")[1];
+//        Jws<Claims> token = this.jwtService.parseJwt(jwt);
+
+        String userId = ctx.pathParam("user_id");
+
+//        if(!token.getBody().get("user_role").equals("Employee") || token.getBody().get("user_role").equals("Manager")){
+//            throw new UnauthorizedResponse("You are not authorized to access this page");
+//        };
+//
+//        if(token.getBody().get("user_role").equals("Employee") && !("" + token.getBody().get("user_id")).equals(userId)){
+//            throw new UnauthorizedResponse("You can only access your own assignments");
+//        };
+
+        String reimbursementId = ctx.pathParam("reimbursement_id");
+
+
+        InputStream reimbReceipt = this.reimbursementService.getReimbursementImage(reimbursementId, userId);
+        Tika tika = new Tika();
+        String mimeType = tika.detect(reimbReceipt);
+
+        ctx.header("Content-type", mimeType);
+        ctx.result(reimbReceipt);
+    };
+
     @Override
     public void mapEndPoints(Javalin app) {
         app.get("/reimbursements", getAllReimbursements);
         app.get("/users/{user_id}/reimbursements", getAllReimbursementsById);
         app.post("/users/{user_id}/reimbursements", addReimbursement);
+        app.get("/users/{user_id}/reimbursements/{reimbursement_id}/image",getReimbursementImage);
         app.patch("/reimbursements/{reimbursement_id}", reviewReimbursement);
     }
 }

@@ -3,8 +3,13 @@ package com.revature.service;
 import com.revature.dao.ReimbursementDao;
 import com.revature.dto.AddReimbursementDTO;
 import com.revature.dto.ResponseReimbursementDTO;
+import com.revature.exception.ImageNotFoundException;
+import com.revature.exception.InvalidImageException;
 import com.revature.model.Reimbursement;
+import org.apache.tika.Tika;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +33,7 @@ public class ReimbursementService {
             Reimbursement reimbursement = this.reimbursementDao.reviewReimbursement(intReimbId,reimbResolverId,reimbStatus);
             return new ResponseReimbursementDTO(reimbursement.getReimbId(),
                     reimbursement.getReimbAmt(), reimbursement.getReimbSubmitted(), reimbursement.getReimbResolved(), reimbursement.getReimbDescription(),
-                     reimbursement.getReimbReceipt(),reimbursement.getReimbAuthor().getUsername(),
+                     reimbursement.getReimbAuthor().getUsername(),
                     reimbursement.getReimbResolver().getUsername(),
                     reimbursement.getReimbStatus(),reimbursement.getReimbType());
 
@@ -37,15 +42,20 @@ public class ReimbursementService {
         }
     }
 
-    public List<Reimbursement> addReimbursement(int reimbAuthorId, AddReimbursementDTO dto) throws SQLException {
-//        Reimbursement reimbursementAdded = this.reimbursementDao.addReimbursement(reimbAuthorId, dto);
-        List<Reimbursement> updatedReimbursementList = this.reimbursementDao.addReimbursement(reimbAuthorId,dto);
-//        return new ResponseReimbursementDTO(reimbursementAdded.getReimbId(), reimbursementAdded.getReimbAmt(),reimbursementAdded.getReimbSubmitted(),
-//                reimbursementAdded.getReimbDescription(), reimbursementAdded.getReimbReceipt(),reimbursementAdded.getReimbAuthor().getUsername(),
-//                reimbursementAdded.getReimbResolver().getUsername(),
-//                reimbursementAdded.getReimbStatus(),reimbursementAdded.getReimbType());
+    public ResponseReimbursementDTO addReimbursement(int reimbAuthorId, AddReimbursementDTO dto) throws SQLException, InvalidImageException, IOException {
 
-        return updatedReimbursementList;
+        Tika tika = new Tika();
+        String mimeType = tika.detect(dto.getReimbReceipt());
+
+        if(!mimeType.equals("image/jpeg") && !mimeType.equals("image/png") && !mimeType.equals("image/gif")){
+            throw new InvalidImageException("Image must be a JPEG, PNG, or GIF");
+        }
+        Reimbursement reimbursement = this.reimbursementDao.addReimbursement(reimbAuthorId,dto);
+        return new ResponseReimbursementDTO(reimbursement.getReimbId(),
+                reimbursement.getReimbAmt(), reimbursement.getReimbSubmitted(), reimbursement.getReimbResolved(), reimbursement.getReimbDescription(),
+                reimbursement.getReimbAuthor().getUsername(),
+                reimbursement.getReimbResolver().getUsername(),
+                reimbursement.getReimbStatus(),reimbursement.getReimbType());
     }
 
     public List<ResponseReimbursementDTO> getAllReimbursements() throws SQLException {
@@ -57,7 +67,7 @@ public class ReimbursementService {
              reimbursements) {
             reimbursementDTOs.add(new ResponseReimbursementDTO(reimbursement.getReimbId(), reimbursement.getReimbAmt(),
                     reimbursement.getReimbSubmitted(), reimbursement.getReimbResolved(), reimbursement.getReimbDescription(),
-                    reimbursement.getReimbReceipt(),reimbursement.getReimbAuthor().getUsername(),
+                    reimbursement.getReimbAuthor().getUsername(),
                     reimbursement.getReimbResolver().getUsername(),reimbursement.getReimbStatus(),
                     reimbursement.getReimbType()));
         }
@@ -75,11 +85,30 @@ public class ReimbursementService {
                 reimbursements) {
             reimbursementDTOs.add(new ResponseReimbursementDTO(reimbursement.getReimbId(), reimbursement.getReimbAmt(),
                     reimbursement.getReimbSubmitted(),reimbursement.getReimbResolved(), reimbursement.getReimbDescription(),
-                    reimbursement.getReimbReceipt(),reimbursement.getReimbAuthor().getUsername(),
+                    reimbursement.getReimbAuthor().getUsername(),
                     reimbursement.getReimbResolver().getUsername(),reimbursement.getReimbStatus(),
                     reimbursement.getReimbType()));
         }
 
         return reimbursementDTOs;
+    }
+
+    public InputStream getReimbursementImage(String reimbId, String empId) throws SQLException, ImageNotFoundException {
+        try{
+            int rId = Integer.parseInt(reimbId);
+            int eId = Integer.parseInt(empId);
+            InputStream is = this.reimbursementDao.getReimbursementImage(rId, eId);
+
+            if(is == null){
+                throw new ImageNotFoundException("Reimbursement id " + reimbId + " does not have an imagge");
+            }
+
+            return is;
+        } catch(NumberFormatException e){
+            throw new IllegalArgumentException("Reimburesement id and emp id must be an int value");
+        }
+
+
+
     }
 }

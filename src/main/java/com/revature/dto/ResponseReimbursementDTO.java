@@ -2,6 +2,7 @@ package com.revature.dto;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class ResponseReimbursementDTO {
 
@@ -10,7 +11,6 @@ public class ResponseReimbursementDTO {
     private Timestamp reimbSubmitted;
     private Timestamp reimbResolved;
     private String reimbDescription;
-    private InputStream reimbReceipt;
     private String reimbAuthor;
     private String reimbResolver;
     private String reimbStatus;
@@ -19,13 +19,12 @@ public class ResponseReimbursementDTO {
     public ResponseReimbursementDTO() {
     }
 
-    public ResponseReimbursementDTO(int reimbId, double reimbAmount, Timestamp reimbSubmitted, Timestamp reimbResolved, String reimbDescription, InputStream reimbReceipt, String reimbAuthor, String reimbResolver, String reimbStatus, String reimbType) {
+    public ResponseReimbursementDTO(int reimbId, double reimbAmount, Timestamp reimbSubmitted, Timestamp reimbResolved, String reimbDescription, String reimbAuthor, String reimbResolver, String reimbStatus, String reimbType) {
         this.reimbId = reimbId;
         this.reimbAmount = reimbAmount;
         this.reimbSubmitted = reimbSubmitted;
         this.reimbResolved = reimbResolved;
         this.reimbDescription = reimbDescription;
-        this.reimbReceipt = reimbReceipt;
         this.reimbAuthor = reimbAuthor;
         this.reimbResolver = reimbResolver;
         this.reimbStatus = reimbStatus;
@@ -72,14 +71,6 @@ public class ResponseReimbursementDTO {
         this.reimbDescription = reimbDescription;
     }
 
-    public InputStream getReimbReceipt() {
-        return reimbReceipt;
-    }
-
-    public void setReimbReceipt(InputStream reimbReceipt) {
-        this.reimbReceipt = reimbReceipt;
-    }
-
     public String getReimbAuthor() {
         return reimbAuthor;
     }
@@ -111,4 +102,33 @@ public class ResponseReimbursementDTO {
     public void setReimbType(String reimbType) {
         this.reimbType = reimbType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResponseReimbursementDTO that = (ResponseReimbursementDTO) o;
+        return reimbId == that.reimbId && Double.compare(that.reimbAmount, reimbAmount) == 0 && Objects.equals(reimbSubmitted, that.reimbSubmitted) && Objects.equals(reimbResolved, that.reimbResolved) && Objects.equals(reimbDescription, that.reimbDescription) && Objects.equals(reimbAuthor, that.reimbAuthor) && Objects.equals(reimbResolver, that.reimbResolver) && Objects.equals(reimbStatus, that.reimbStatus) && Objects.equals(reimbType, that.reimbType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reimbId, reimbAmount, reimbSubmitted, reimbResolved, reimbDescription, reimbAuthor, reimbResolver, reimbStatus, reimbType);
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseReimbursementDTO{" +
+                "reimbId=" + reimbId +
+                ", reimbAmount=" + reimbAmount +
+                ", reimbSubmitted=" + reimbSubmitted +
+                ", reimbResolved=" + reimbResolved +
+                ", reimbDescription='" + reimbDescription + '\'' +
+                ", reimbAuthor='" + reimbAuthor + '\'' +
+                ", reimbResolver='" + reimbResolver + '\'' +
+                ", reimbStatus='" + reimbStatus + '\'' +
+                ", reimbType='" + reimbType + '\'' +
+                '}';
+    }
 }
+

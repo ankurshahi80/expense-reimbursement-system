@@ -114,9 +114,9 @@ public class ReimbursementDao {
         }
     }
 
-    public List<Reimbursement> addReimbursement(int userId, AddReimbursementDTO dto) throws SQLException {
+    public Reimbursement addReimbursement(int userId, AddReimbursementDTO dto) throws SQLException {
         try(Connection con = ConnectionUtility.getConnection()){
-            con.setAutoCommit(false);
+//            con.setAutoCommit(false);
 
             String sql = "INSERT INTO ers_reimbursement " +
                     "(reimb_amount, reimb_submitted, reimb_description, " +
@@ -138,31 +138,11 @@ public class ReimbursementDao {
             rs.next();
             int reimbId = rs.getInt(1);
 
-//            String sql2 = "SELECT * FROM ers_users WHERE ers_users_id= ?";
-//            PreparedStatement pstmt2 = con.prepareStatement(sql2);
-//            pstmt2.setInt(1,userId);
-//
-//            ResultSet rs2 = pstmt2.executeQuery();
-//            rs2.next();
-//
-//            int reimbAuthorId = rs2.getInt("ers_users_id");
-//            String reimbAuthorName = rs2.getString("ers_username");
-//            String reimbAuthorPassword = rs2.getString("ers_password");
-//            String reimbAuthorFirstName = rs2.getString("user_first_name");
-//            String reimbAuthorLastName = rs2.getString("user_last_name");
-//            String reimbAuthorEmail = rs2.getString("user_email");
-//            String reimbAuthorRole = "Employee";
-//
-//            Timestamp reimbSubmitted = rs2.getTimestamp("reimb_submitted");
-//            Timestamp reimbResolved = rs2.getTimestamp("reimb_resolved");
-//
-//            User reimbAuthor = new User(reimbAuthorId, reimbAuthorName, reimbAuthorPassword, reimbAuthorFirstName, reimbAuthorLastName, reimbAuthorEmail, reimbAuthorRole);
-//
-//            Reimbursement reimbursement = new Reimbursement(reimbId, dto.getReimbAmount(),reimbSubmitted, reimbResolved,dto.getReimbDescription(),dto.getReimbReceipt(),reimbAuthor,null,"Pending","To be Coded");
-                List<Reimbursement> reimbursements = getAllReimbursementsById(userId);
-            con.commit();
+            Reimbursement reimbursement =  getReimbursementsById(reimbId);
 
-            return reimbursements;
+//            con.commit();
+
+            return reimbursement;
         }
 
     }
@@ -335,4 +315,106 @@ public class ReimbursementDao {
         }
     }
 
+    public Reimbursement getReimbursementsById(int reimbId) throws SQLException {
+        try(Connection con = ConnectionUtility.getConnection()) {
+
+            String sql = "select er.reimb_id as reimbursement_id, " +
+                    "er.reimb_amount as reimbursement_amount, " +
+                    "er.reimb_submitted as date_submitted, " +
+                    "er.reimb_resolved as date_resolved, " +
+                    "er.reimb_description as reimbursement_description, " +
+                    "er.reimb_receipt as reimbursement_receipt, " +
+                    "er.reimb_author as employee_id, " +
+                    "emp_eu.ers_username as employee_username, " +
+                    "emp_eu.ers_password as employee_password, " +
+                    "emp_eu.user_first_name as employee_first_name, " +
+                    "emp_eu.user_last_name as employee_last_name, " +
+                    "emp_eu.user_email as employee_email, " +
+                    "er.reimb_resolver as manager_id, " +
+                    "mgr_eu.ers_username as manager_username, " +
+                    "mgr_eu.ers_password as manager_password, " +
+                    "mgr_eu.user_first_name as manager_first_name, " +
+                    "mgr_eu.user_last_name as manager_last_name, " +
+                    "mgr_eu.user_email as manager_email, " +
+                    "ers.reimb_status as reimbursement_status, " +
+                    "ert.reimb_type as reimbursement_type " +
+                    "FROM ers_reimbursement er " +
+                    "LEFT JOIN ers_users emp_eu " +
+                    "ON emp_eu.ers_users_id = er.reimb_author " +
+                    "LEFT JOIN ers_users mgr_eu " +
+                    "ON mgr_eu.ers_users_id = er.reimb_resolver " +
+                    "LEFT JOIN ers_reimbursement_status ers " +
+                    "ON ers.reimb_status_id = er.reimb_status_id " +
+                    "LEFT JOIN ers_reimbursement_type ert " +
+                    "ON ert.reimb_type_id = er.reimb_type_id " +
+                    "WHERE er.reimb_id = ?";
+
+            PreparedStatement ptsmt = con.prepareStatement(sql);
+            ptsmt.setInt(1, reimbId);
+
+
+            ResultSet rs = ptsmt.executeQuery();
+            rs.next();
+
+            // Reimbursement
+
+            double reimbAmt = rs.getDouble("reimbursement_amount");
+            Timestamp reimbSubmitted = rs.getTimestamp("date_submitted");
+            Timestamp reimbResolved = rs.getTimestamp("date_resolved");
+            String reimbDescription = rs.getString("reimbursement_description");
+            InputStream reimbReceipt = rs.getBinaryStream("reimbursement_receipt");
+
+            // Author
+            int reimbAuthorId = rs.getInt("employee_id");
+            String reimbAuthorName = rs.getString("employee_username");
+            String reimbAuthorPassword = rs.getString("employee_password");
+            String reimbAuthorFirstName = rs.getString("employee_first_name");
+            String reimbAuthorLastName = rs.getString("employee_last_name");
+            String reimbAuthorEmail = rs.getString("employee_email");
+            String reimbAuthorRole = "Employee";
+
+            User reimbAuthor = new User(reimbAuthorId, reimbAuthorName, reimbAuthorPassword, reimbAuthorFirstName, reimbAuthorLastName, reimbAuthorEmail, reimbAuthorRole);
+
+            // Resolver
+            int reimbResolverId = rs.getInt("manager_id");
+            String reimbResolverName = rs.getString("manager_username");
+            String reimbResolverPassword = rs.getString("manager_password");
+            String reimbResolverFirstName = rs.getString("manager_first_name");
+            String reimbResolverLastName = rs.getString("manager_last_name");
+            String reimbResolverEmail = rs.getString("manager_email");
+            String reimbResolverRole = "Manager";
+
+            User reimbResolver = new User(reimbResolverId, reimbResolverName, reimbResolverPassword, reimbResolverFirstName, reimbResolverLastName, reimbResolverEmail, reimbResolverRole);
+
+            String reimbStatus = rs.getString("reimbursement_status");
+            String reimbType = rs.getString("reimbursement_type");
+
+            Reimbursement r = new Reimbursement(reimbId, reimbAmt, reimbSubmitted, reimbResolved, reimbDescription,
+                    reimbReceipt, reimbAuthor, reimbResolver, reimbStatus, reimbType);
+
+            return r;
+        }
+    }
+
+    public InputStream getReimbursementImage(int reimbId, int empId) throws SQLException {
+        try(Connection con = ConnectionUtility.getConnection()){
+            String sql = "SELECT er.reimb_receipt " +
+                    " FROM ers_reimbursement er " +
+                    "WHERE er.reimb_id = ? AND " +
+                    "er.reimb_author = ?";
+
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,reimbId);
+            pstmt.setInt(2,empId);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if(rs.next()){
+                InputStream is = rs.getBinaryStream("reimb_receipt");
+                return is;
+            } else {
+                return null;
+            }
+        }
+    };
 }
