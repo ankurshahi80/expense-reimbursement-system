@@ -20,6 +20,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.4.0'
     implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
+    implementation 'org.apache.tika:tika-core:2.3.0'
 }
 
 test {

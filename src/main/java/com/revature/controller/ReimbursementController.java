@@ -11,6 +11,7 @@ import io.javalin.http.UnauthorizedResponse;
 import io.javalin.http.UploadedFile;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import org.apache.tika.Tika;
 
 import java.io.InputStream;
 import java.util.List;
@@ -51,11 +52,10 @@ public class ReimbursementController implements Controller{
         if(!token.getBody().get("user_id").equals(id)){
             throw new UnauthorizedResponse("You cannot submit reimbursements for other employees.");
         }
+        AddReimbursementDTO dto = new AddReimbursementDTO();
 
-//        AddReimbursementDTO dto = ctx.bodyAsClass(AddReimbursementDTO.class);
         // capture reimbursement amount
         double reimbAmount = Double.parseDouble(ctx.formParam("reimbAmount"));
-        AddReimbursementDTO dto = new AddReimbursementDTO();
         dto.setReimbAmount(reimbAmount);
 
         // capture reimbursement description
@@ -64,8 +64,11 @@ public class ReimbursementController implements Controller{
 
         // capture reimbursement receipt (image)
         UploadedFile file = ctx.uploadedFile("reimbReceipt");
-        InputStream is = file.getContent();
-        dto.setReimbReceipt(is);
+//        InputStream is = file.getContent();
+//        Tika tika = new Tika();
+//        String mimeType = tika.detect(is);
+
+//        dto.setReimbReceipt(is);
 
         // capture reimbursement type
         int reimbType = Integer.parseInt(ctx.formParam("reimbType"));
@@ -87,8 +90,7 @@ public class ReimbursementController implements Controller{
         }
 
         String reimbId = ctx.pathParam("reimbursement_id");
-        ReimbursementStatus reimbStatus = ctx.bodyAsClass(ReimbursementStatus.class);
-        String reimbStatusString = reimbStatus.getReimbStatus().toLowerCase();
+        String reimbStatusString =ctx.body().toLowerCase();
 
         int reimbStatusInt = 0;
         switch (reimbStatusString) {
@@ -97,7 +99,7 @@ public class ReimbursementController implements Controller{
             case "denied": reimbStatusInt = 3;
                             break;
         }
-        ctx.json(reimbStatusInt);
+
         int reimbResolverId = token.getBody().get("user_id", Integer.class);
 
         ResponseReimbursementDTO reimbursement = this.reimbursementService.reviewReimbursement(reimbId,reimbStatusInt,reimbResolverId);
@@ -118,8 +120,8 @@ public class ReimbursementController implements Controller{
             throw new UnauthorizedResponse("You cannot view reimbursements for other employees.");
         }
 
-        List<ResponseReimbursementDTO> reimbursements = this.reimbursementService.getAllReimbursementsById(id);
-        ctx.json(reimbursements);
+        List<ResponseReimbursementDTO> reimbursementDTOs = this.reimbursementService.getAllReimbursementsById(id);
+        ctx.json(reimbursementDTOs);
     };
 
     @Override

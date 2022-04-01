@@ -24,6 +24,7 @@ public class AuthenticationController implements Controller {
 
         String jwt = this.jwtService.createJwt(user);
 
+        ctx.header("Access-Control-Expose-Headers","*");
         ctx.header("token",jwt);
         ctx.json(user);
     };

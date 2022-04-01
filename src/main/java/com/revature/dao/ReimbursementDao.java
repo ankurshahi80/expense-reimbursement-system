@@ -19,7 +19,6 @@ public class ReimbursementDao {
     public Reimbursement reviewReimbursement(int reimbId, int reimResolver, int reimbStatus ) throws SQLException {
         try (Connection con = ConnectionUtility.getConnection()) {
             con.setAutoCommit(false);
-            ;
 
             String sql = "UPDATE ers_reimbursement " +
                     "SET reimb_status_id = ?, " +
@@ -200,7 +199,8 @@ public class ReimbursementDao {
                     "LEFT JOIN ers_reimbursement_status ers "+
                     "ON ers.reimb_status_id = er.reimb_status_id "+
                     "LEFT JOIN ers_reimbursement_type ert " +
-                    "ON ert.reimb_type_id = er.reimb_type_id ";
+                    "ON ert.reimb_type_id = er.reimb_type_id " +
+                    " ORDER BY er.reimb_id";
 
             PreparedStatement ptsmt = con.prepareStatement(sql);
 
@@ -214,6 +214,7 @@ public class ReimbursementDao {
                 Timestamp reimbResolved = rs.getTimestamp("date_resolved");
                 String reimbDescription = rs.getString("reimbursement_description");
                 InputStream reimbReceipt = rs.getBinaryStream("reimbursement_receipt");
+                System.out.println(reimbReceipt);
 
                 // Author
                 int reimbAuthorId = rs.getInt("employee_id");
