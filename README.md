@@ -29,7 +29,7 @@ The Expense Reimbursement System (ERS) will manage the process of reimbursing em
 ## Getting Started
 1. Use the Command Line to create a new folder `mkdir<folder-name>` on your local machine to save the front-end and back-end repositories.  
 2. Navigate to you new folder using `cd <folder-name>` and clone this repo using `git clone <repo-link>`.
-3. Clone the [backend repo](https://github.com/ankurshahi80/expense-reimbursement-system) in the same folder using `git clone <repo-link>`
+3. Clone the [frontend repo](https://github.com/ankurshahi80/expense-reimbursement-system-front-end) in the same folder using `git clone <repo-link>`
 4. Make sure you have have the following tools installed on your local machine.
   - [Visual Studio (VS) Code](https://code.visualstudio.com/)
   - [Java SE Development Kit 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)  
